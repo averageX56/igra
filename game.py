@@ -22,8 +22,10 @@ print(pygame.RESIZABLE)
 
 pygame.init()
 mouse_x, mouse_y = pygame.mouse.get_pos()
-textures = {0:[pygame.image.load('0.png')],
-             1:[pygame.image.load('1.png')]}
+textures = dict()
+for i in range(625):
+    textures[i] = pygame.image.load(str(i)+'.png')
+print(textures)
 
 world_size_chunk_x = 25//chunk_size
 world_size_chunk_y = 25//chunk_size
@@ -82,7 +84,7 @@ class Chunk():
     def render(self, texture_code):
         for y in range(chunk_size):
             for x in range(chunk_size):
-                texture = textures[texture_code][0]
+                texture = textures[texture_code]
                 screen.blit(texture, (self.x + x*tile_size - cam_x, self.y + y*tile_size - cam_y))
 
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
