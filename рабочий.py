@@ -27,6 +27,8 @@ study_bilding5 = [119, 120, 121, 144, 145, 146, 169, 170, 171]
 study_bilding6 = [155, 156, 157, 180, 181, 182, 205, 206, 207]
 small_building1 = [220, 221, 245, 246]
 small_building2 = [217, 218, 242, 243]
+open_chuncks = ['std1','std2','std3','std4','std5','std6','sml1','sml2','hs1','hs2','hs3','hs4','hs5','hs6','hs7','hs8','hs9','hs10','hs11','hs12','hs13','hs14','hs15','hs16','hs17','hs18','hs19','hs20']
+
 for i in range(625):
     if i in study_bilding1:
         file.write(str(i)+'  std1'+'\n')

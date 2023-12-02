@@ -1,4 +1,5 @@
 import pygame
+from рабочий import *
 import math
 import random
 import time
@@ -19,6 +20,7 @@ WHITE = 0xFFFFFF
 cam_x, cam_y = 0, 0
 res = [1536, 960]
 print(pygame.RESIZABLE)
+menu_flag=False
 
 pygame.init()
 mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -59,8 +61,17 @@ def generate_tile(x, y, chunk_x, chunk_y):
     return int((chunk_x//chunk_size//tile_size)%2 == 0)
 
 #Функция вызова меню магазина (не сделано)
-def open_menu():
-    pass
+def open_menu(menu_type):
+    global menu_flag
+    menu_flag = True
+    if menu_type == 'std1' and not menu_flag:
+        menu_flag = True
+
+def close_menu():
+    global menu_flag
+    menu_flag = False
+
+
 
 #Функция обработки случайного события
 def random_event(key):
@@ -157,6 +168,8 @@ while not finished:
     for i in chunks_on_screen():
         chunks[i].render(chuncks_texture_codes[i])
     window.blit(pygame.transform.scale(screen, res), (0, 0))
+    if menu_flag:
+        pygame.draw.rect(window, WHITE, pygame.Rect(100, 100, 1330, 750))
     pygame.display.update()
 
     #обработка событий
@@ -166,29 +179,32 @@ while not finished:
             finished = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                #делаем сохранение
+                if menu_flag == False:
+                    #делаем сохранение
 
-                chuncks_file.close()
-                chuncks_file = open('chuncks.txt','w')
-                chuncks_file.seek(0)
-                for i in range(625):
-                    chuncks_file.write(str(chuncks_texture_codes[i])+'  '+chuncks_types[i]+'\n')
-                chuncks_file.close()
+                    chuncks_file.close()
+                    chuncks_file = open('chuncks.txt','w')
+                    chuncks_file.seek(0)
+                    for i in range(625):
+                        chuncks_file.write(str(chuncks_texture_codes[i])+'  '+chuncks_types[i]+'\n')
+                    chuncks_file.close()
 
-                info_file = open('game_info.txt','w')
-                info_file.seek(0)
-                for i in range(len(rnd_events_list)):
-                    info_file.write(str(rnd_events_list[i])+' ')
+                    info_file = open('game_info.txt','w')
+                    info_file.seek(0)
+                    for i in range(len(rnd_events_list)):
+                        info_file.write(str(rnd_events_list[i])+' ')
 
-                #закрываем программу
-                finished = True
+                    #закрываем программу
+                    finished = True
+                else:
+                    close_menu()
 
         #обработка нажатия мыши
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 #проверка типа нажатого тейла и соответсвующая обработка события
-                if chuncks_types[mouse_on_chunk_number] == 'open1':
-                    print(2)
+                if chuncks_types[mouse_on_chunk_number] in open_chuncks:
+                    open_menu(chuncks_types[mouse_on_chunk_number])
 
 
 pygame.quit()
