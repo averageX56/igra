@@ -64,8 +64,18 @@ def generate_tile(x, y, chunk_x, chunk_y):
 def open_menu(menu_type):
     global menu_flag
     menu_flag = True
-    if menu_type == 'std1' and not menu_flag:
-        menu_flag = True
+    if 'std' in menu_type:
+        pass
+    elif 'food' in menu_type:
+        pass
+    elif 'shop' in menu_type:
+        pass
+    elif 'hs' in menu_type:
+        if int(menu_type[2:]) < 10:
+            pass
+        else:
+            pass
+
 
 def close_menu():
     global menu_flag
@@ -198,13 +208,18 @@ while not finished:
                     finished = True
                 else:
                     close_menu()
-
-        #обработка нажатия мыши
+#обработка нажатия мыши
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            #ЛКМ
             if event.button == 1:
                 #проверка типа нажатого тейла и соответсвующая обработка события
-                if chuncks_types[mouse_on_chunk_number] in open_chuncks:
+                if menu_flag:
+                    #нажатие при открытом меню
+                    print(mouse_x, mouse_y)
+                elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not menu_flag:
+                    #вызов меню при нажатии по чанку
                     open_menu(chuncks_types[mouse_on_chunk_number])
+
 
 
 pygame.quit()
