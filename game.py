@@ -108,6 +108,62 @@ class Chunk():
                 texture = textures[texture_code]
                 screen.blit(texture, (self.x + x*tile_size - cam_x, self.y + y*tile_size - cam_y))
 
+class Building():
+    def __init__(self):
+        self.income = 0
+        self.outcome = 0
+        self.happy = 0
+        self.built = 0
+
+    def money_exsc(self):
+        global money, happy
+        money += (self.income - self.outcome) * self.built
+        happy += (self.happy) * self.built
+
+class Dorm1(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0.5
+        self.outcome = 0.01
+        self.happy = -0.01
+
+class Dorm2(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0.6
+        self.outcome = 0.01
+        self.happy = -0.05
+
+class Dorm3(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0.2
+        self.outcome = 0.01
+        self.happy = 0
+
+class Foodc(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0.5
+        self.outcome = 0.1
+        self.happy = 0.03
+
+class Sport(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0
+        self.outcome = 0.2
+        self.happy = 0.07
+
+class Learn(Building):
+    def __init__(self):
+        Building.__init__(self, self.built)
+        self.income = 0
+        self.outcome = 0.6
+        self.happy = 0.15
+
+
+
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
 #Чтение файла с кодами текстур чанков из памяти
