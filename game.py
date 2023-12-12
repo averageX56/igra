@@ -25,13 +25,10 @@ menu_flag=False
 pygame.init()
 mouse_x, mouse_y = pygame.mouse.get_pos()
 textures = dict()
-import glob
 
-files = glob.glob("B/*.jpeg")
-for f in files:
-    os.remove(f)
-# for i in range(625):
-    # textures[i] = pygame.image.load((f'images/{i}.png'))
+
+for i in range(625):
+    textures[i] = pygame.image.load((f'images/{i}.png'))
 
 print(files)
 
