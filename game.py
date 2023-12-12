@@ -5,7 +5,7 @@ import random
 import time
 from tkinter import *
 from tkinter import messagebox
-
+import os
 
 FPS = 60
 
@@ -26,7 +26,7 @@ pygame.init()
 mouse_x, mouse_y = pygame.mouse.get_pos()
 textures = dict()
 for i in range(625):
-    textures[i] = pygame.image.load(str(i)+'.png')
+    textures[i] = pygame.image.load((f'images/{i}.png'))
 print(textures)
 
 world_size_chunk_x = 25//chunk_size
@@ -235,7 +235,7 @@ while not finished:
         chunks[i].render(chuncks_texture_codes[i])
     window.blit(pygame.transform.scale(screen, res), (0, 0))
     if menu_flag:
-        pygame.draw.rect(window, WHITE, pygame.Rect(100, 100, 1330, 750))
+        pygame.draw.rect(window, WHITE, pygame.Rect(res[0]/2 - 650/2, res[1]/2 - 450, 650, 800))
     pygame.display.update()
 
     #обработка событий
