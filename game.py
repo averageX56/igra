@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import messagebox
 import os
 
+
 FPS = 60
 
 chunk_size = 1
@@ -28,9 +29,8 @@ textures = dict()
 
 
 for i in range(625):
-    textures[i] = pygame.image.load((f'images/{i}.png'))
+    textures[i] = pygame.image.load((f'images\\{i}.png'))
 
-print(files)
 
 world_size_chunk_x = 25//chunk_size
 world_size_chunk_y = 25//chunk_size
