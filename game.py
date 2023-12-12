@@ -277,5 +277,4 @@ while not finished:
                     open_menu(chuncks_types[mouse_on_chunk_number])
 
 
-
 pygame.quit()
