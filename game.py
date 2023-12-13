@@ -34,14 +34,14 @@ textures['food'] = pygame.image.load('images\\shop_up.png')
 textures['base_left'] = pygame.image.load('images\\shop_down_left.png')
 textures['base_right'] = pygame.image.load('images\\shop_down_right.png')
 for t in ['GK', 'KPM', 'NK', 'LK','ARKTICA', 'CIFRA']:
-    for r in (1, 10):
+    for r in range(1, 10):
         textures[t+str(r)] = pygame.image.load('images\\'+t+'_0'+str(r)+'.jpg')
 for i in range(1, 15):
     for j in range(1, 5):
-        textures['dm' + str(i) + '_' + str(j)] = pygame.image.load('image\\dorm'+str(i)+'_0'+str(j+int(j > 2))+'.jpg')
+        textures['dm' + str(i) + '_' + str(j)] = pygame.image.load('images\\dorm'+str(i)+'_0'+str(j+int(j > 2))+'.jpg')
 for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2']:
     for j in range(1, 5):
-        textures[i+str(j)] = pygame.image.load('image\\' + i + '_0' + str(j)+'.jpg')
+        textures[i+str(j)] = pygame.image.load('images\\' + i + '_0' + str(j+int(j>2))+'.jpg')
 
 
 world_size_chunk_x = 25//chunk_size
