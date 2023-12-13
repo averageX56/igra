@@ -10,7 +10,6 @@ from tkinter import messagebox
 FPS = 60
 
 chunk_size = 1
-#tile_size соответсвует разрешению изображения
 tile_size = 150
 cam_speed = 15
 random_event_timer = -500
@@ -27,9 +26,9 @@ font = pygame.font.Font('font.ttf', 60)
 mouse_x, mouse_y = pygame.mouse.get_pos()
 textures = dict()         # Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
 for i in range(625):
-    textures[i] = pygame.image.load((f'images/{i}.png'))
-textures['cur_happy'] = pygame.image.load(('images\\cur_happy.png'))
-textures['cur_money'] = pygame.image.load(('images\\cur_money.png'))
+    textures[i] = pygame.image.load(f'images/{i}.png')
+textures['cur_happy'] = pygame.image.load('images\\cur_happy.png')
+textures['cur_money'] = pygame.image.load('images\\cur_money.png')
 textures['std'] = pygame.image.load('images\\shop_learn.png')
 textures['food'] = pygame.image.load('images\\shop_up.png')
 textures['base_left'] = pygame.image.load('images\\shop_down_left.png')
@@ -39,13 +38,13 @@ world_size_chunk_x = 25//chunk_size
 world_size_chunk_y = 25//chunk_size
 
 
-#chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране (остальные не прорисовываем для оптимизации)
+##chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране
 def chunks_on_screen():
-    x1 = cam_x//(chunk_size*tile_size)
-    y1 = cam_y//(chunk_size*tile_size)
+    x1 = cam_x // (chunk_size * tile_size)
+    y1 = cam_y // (chunk_size * tile_size)
 
-    x2 = (cam_x + res[0]) //(chunk_size * tile_size)
-    y2 = (cam_y + res[1]) //(chunk_size * tile_size)
+    x2 = (cam_x + res[0]) // (chunk_size * tile_size)
+    y2 = (cam_y + res[1]) // (chunk_size * tile_size)
 
     x1 = min(max(x1, 0), world_size_chunk_x - 1)
     x2 = min(max(x2, 0), world_size_chunk_x - 1)
@@ -59,17 +58,17 @@ def chunks_on_screen():
             result.append(x+y*world_size_chunk_x)
     return result
 
+
 #Функция по координате чанка определяет какая у него текстура(сейчас нет функционала)
 def generate_tile(x, y, chunk_x, chunk_y):
-    tile_x = (chunk_x//tile_size) + x
-    tile_y = (chunk_y//tile_size) + y
-    return int((chunk_x//chunk_size//tile_size)%2 == 0)
-
+    tile_x = (chunk_x // tile_size) + x
+    tile_y = (chunk_y // tile_size) + y
+    return int((chunk_x // chunk_size // tile_size) % 2 == 0)
 
 
 #Функция обработки случайного события
 def random_event(key):
-    if not key in rnd_events_list:
+    if key not in rnd_events_list:
         pass
     else:
         if key == 1:
@@ -92,12 +91,13 @@ class Chunk():
                 texture = textures[texture_code]
                 screen.blit(texture, (self.x + x*tile_size - cam_x, self.y + y*tile_size - cam_y))
 
-class menu():
-    def __init__(self, m_x = res[0]/2 - 330, m_y = res[1]/2 - 450):
+
+class Menu():
+    def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
         self.x, self.y = m_x, m_y
         self.flag = False
-        self.point = -1
         self.type = 0
+        self.chosen_point = 0
 
     def close_menu(self):
         self.flag = False
@@ -116,7 +116,7 @@ class menu():
             self.type = 'base_right'
 
     def render(self):
-        if self.flag == True:
+        if self.flag is True:
             if self.type == 'std':
                 screen.blit(textures['std'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
@@ -130,13 +130,32 @@ class menu():
                 screen.blit(textures['base_right'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
 
-
     def point_detect(self):
-        global mouse_x, mouse_y
+        global chosen_x, chosen_y
+        if chosen_x in range(470, 738):
+            if chosen_y in range(155, 205):
+                self.chosen_point = 1
+            elif chosen_y in range(255, 305):
+                self.chosen_point = 2
+            elif chosen_y in range(360, 410):
+                self.chosen_point = 3
+            elif chosen_y in range(460, 510):
+                self.chosen_point = 4
+            elif chosen_y in range(560, 610):
+                self.chosen_point = 5
+        if chosen_x in range(783, 1050):
+            if chosen_y in range(155, 205):
+                self.chosen_point = 6
+            elif chosen_y in range(255, 305):
+                self.chosen_point = 7
+            elif chosen_y in range(360, 410):
+                self.chosen_point = 8
+            elif chosen_y in range(460, 510):
+                self.chosen_point = 9
+            elif chosen_y in range(560, 610):
+                self.chosen_point = 10
 
-
-
-class Building():
+class Building:
     def __init__(self):
         self.income = 0
         self.outcome = 0
@@ -146,10 +165,11 @@ class Building():
     def money_exsc(self):
         global money, happy
         money += (self.income - self.outcome) * self.built
-        happy += (self.happy) * self.built
+        happy += self.happy * self.built
 
     def build_new(self):
         self.built += 1
+
 
 class Dorm1(Building):
     def __init__(self):
@@ -158,12 +178,14 @@ class Dorm1(Building):
         self.outcome = 0.01
         self.happy = -0.01
 
+
 class Dorm2(Building):
     def __init__(self):
         Building.__init__(self, self.built)
         self.income = 0.6
         self.outcome = 0.01
         self.happy = -0.05
+
 
 class Dorm3(Building):
     def __init__(self):
@@ -172,6 +194,7 @@ class Dorm3(Building):
         self.outcome = 0.01
         self.happy = 0
 
+
 class Foodc(Building):
     def __init__(self):
         Building.__init__(self, self.built)
@@ -179,12 +202,14 @@ class Foodc(Building):
         self.outcome = 0.1
         self.happy = 0.03
 
+
 class Sport(Building):
     def __init__(self):
         Building.__init__(self, self.built)
         self.income = 0
         self.outcome = 0.2
         self.happy = 0.07
+
 
 class Learn(Building):
     def __init__(self):
@@ -194,13 +219,12 @@ class Learn(Building):
         self.happy = 0.15
 
 
-
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
 #Чтение файла с кодами текстур чанков из памяти
-chuncks_file = open('chuncks.txt','r+')
-chuncks_texture_codes=[]
-chuncks_types=[]
+chuncks_file = open('chuncks.txt', 'r+')
+chuncks_texture_codes = []
+chuncks_types = []
 for i in range(625):
     chunk_info = chuncks_file.readline()
     just_code, just_type = chunk_info.split()
@@ -209,18 +233,19 @@ for i in range(625):
 chuncks_file.close()
 
 #Чтение файла с общей информацией
-info_file = open('game_info.txt','r')
-rnd_events_list = list(map(int,info_file.readline().split()))
+info_file = open('game_info.txt', 'r')
+rnd_events_list = list(map(int, info_file.readline().split()))
 info_file.close()
 
 
-window = pygame.display.set_mode((0,0), pygame.RESIZABLE)
-fullscreen = pygame.display.set_mode((0,0), pygame.RESIZABLE)
-screen = pygame.transform.scale(window,res)
+window = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
+fullscreen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
+screen = pygame.transform.scale(window, res)
 finished = False
 clock = pygame.time.Clock()
 chunks = []
-Menu = menu()
+chosen_x, chosen_y = 0, 0
+Menu = Menu()
 #создаём все чанки(пока нет работы с памятью)
 for y in range(world_size_chunk_y):
     for x in range(world_size_chunk_x):
@@ -233,16 +258,17 @@ for i in range(len(chunks)):
 
 while not finished:
     clock.tick(FPS)
-    random_event_timer+=1
+    random_event_timer += 1
+    Menu.point_detect()
     if random_event_timer == 1200:
         print('hello')
-        rnd_num = random.randint(1,32)
+        rnd_num = random.randint(1, 32)
         #Обработка случайного события
         random_event(rnd_num)
-        random_event_timer=0
+        random_event_timer = 0
     screen.fill(WHITE)
     mouse_x, mouse_y = pygame.mouse.get_pos()
-    mouse_on_chunk_x, mouse_on_chunk_y = ((mouse_x + cam_x)//tile_size,(mouse_y + cam_y)//tile_size)
+    mouse_on_chunk_x, mouse_on_chunk_y = ((mouse_x + cam_x)//tile_size, (mouse_y + cam_y)//tile_size)
     mouse_on_chunk_number = mouse_on_chunk_y * 25 + mouse_on_chunk_x
     #print(mouse_on_chunk_x, mouse_on_chunk_y)
     #print(clock.get_fps())
@@ -271,7 +297,6 @@ while not finished:
     happy = mouse_x
     money = mouse_y
 
-
     text_1 = font.render(f'x = {happy}', 1, (217, 255, 76))
     screen.blit(text_1, (300, 45))
     text_2 = font.render(f'y = {money}', 1, (240, 175, 14))
@@ -290,17 +315,17 @@ while not finished:
             finished = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                if Menu.flag == False:
+                if Menu.flag is False:
                     #делаем сохранение
 
                     chuncks_file.close()
-                    chuncks_file = open('chuncks.txt','w')
+                    chuncks_file = open('chuncks.txt', 'w')
                     chuncks_file.seek(0)
                     for i in range(625):
                         chuncks_file.write(str(chuncks_texture_codes[i])+'  '+chuncks_types[i]+'\n')
                     chuncks_file.close()
 
-                    info_file = open('game_info.txt','w')
+                    info_file = open('game_info.txt', 'w')
                     info_file.seek(0)
                     for i in range(len(rnd_events_list)):
                         info_file.write(str(rnd_events_list[i])+' ')
@@ -316,12 +341,11 @@ while not finished:
                 #проверка типа нажатого тейла и соответсвующая обработка события
                 if Menu.flag:
                     #нажатие при открытом меню
-                    print(mouse_x, mouse_y)
+                    chosen_x, chosen_y = mouse_x, mouse_y
                 elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not Menu.flag:
                     #вызов меню при нажатии по чанку
                     Menu.open_menu()
                     print(chuncks_types[mouse_on_chunk_number])
     pygame.display.update()
-
 
 pygame.quit()
