@@ -28,8 +28,12 @@ mouse_x, mouse_y = pygame.mouse.get_pos()
 textures = dict()         # Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
 for i in range(625):
     textures[i] = pygame.image.load((f'images/{i}.png'))
-textures['cur_happy'] = pygame.image.load((f'images/cur_happy.png'))
-textures['cur_money'] = pygame.image.load((f'images/cur_money.png'))
+textures['cur_happy'] = pygame.image.load(('images\\cur_happy.png'))
+textures['cur_money'] = pygame.image.load(('images\\cur_money.png'))
+textures['std'] = pygame.image.load('images\\shop_learn.png')
+textures['food'] = pygame.image.load('images\\shop_up.png')
+textures['base_left'] = pygame.image.load('images\\shop_down_left.png')
+textures['base_right'] = pygame.image.load('images\\shop_down_right.png')
 
 world_size_chunk_x = 25//chunk_size
 world_size_chunk_y = 25//chunk_size
@@ -61,27 +65,6 @@ def generate_tile(x, y, chunk_x, chunk_y):
     tile_y = (chunk_y//tile_size) + y
     return int((chunk_x//chunk_size//tile_size)%2 == 0)
 
-#Функция вызова меню магазина (не сделано)
-def open_menu(menu_type):
-    global menu_flag
-    menu_flag = True
-    if 'std' in menu_type:
-        pass
-    elif 'food' in menu_type:
-        pass
-    elif 'shop' in menu_type:
-        pass
-    elif 'hs' in menu_type:
-        if int(menu_type[2:]) < 10:
-            pass
-        else:
-            pass
-
-
-def close_menu():
-    global menu_flag
-    menu_flag = False
-
 
 
 #Функция обработки случайного события
@@ -109,6 +92,48 @@ class Chunk():
                 texture = textures[texture_code]
                 screen.blit(texture, (self.x + x*tile_size - cam_x, self.y + y*tile_size - cam_y))
 
+class menu():
+    def __init__(self, m_x = res[0]/2 - 330, m_y = res[1]/2 - 450):
+        self.x, self.y = m_x, m_y
+        self.flag = False
+        self.point = -1
+        self.type = 0
+
+    def close_menu(self):
+        self.flag = False
+
+    def open_menu(self):
+        self.flag = True
+        if 'std' in chuncks_types[mouse_on_chunk_number]:
+            self.type = 'std'
+        elif 'food' in chuncks_types[mouse_on_chunk_number]:
+            self.type = 'food'
+        elif 'shop' in chuncks_types[mouse_on_chunk_number]:
+            self.type = 'shop'
+        elif 'hs' in chuncks_types[mouse_on_chunk_number] and len(chuncks_types[mouse_on_chunk_number]) == 4:
+            self.type = 'base_left'
+        elif 'hs' in chuncks_types[mouse_on_chunk_number] and len(chuncks_types[mouse_on_chunk_number]) == 3:
+            self.type = 'base_right'
+
+    def render(self):
+        if self.flag == True:
+            if self.type == 'std':
+                screen.blit(textures['std'], (self.x, self.y))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
+            if self.type == 'food':
+                screen.blit(textures['food'], (self.x, self.y))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
+            if self.type == 'base_left':
+                screen.blit(textures['base_left'], (self.x, self.y))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
+            if self.type == 'base_right':
+                screen.blit(textures['base_right'], (self.x, self.y))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
+
+
+    def point_detect(self):
+        global mouse_x, mouse_y
+
 
 
 class Building():
@@ -122,6 +147,9 @@ class Building():
         global money, happy
         money += (self.income - self.outcome) * self.built
         happy += (self.happy) * self.built
+
+    def build_new(self):
+        self.built += 1
 
 class Dorm1(Building):
     def __init__(self):
@@ -192,6 +220,7 @@ screen = pygame.transform.scale(window,res)
 finished = False
 clock = pygame.time.Clock()
 chunks = []
+Menu = menu()
 #создаём все чанки(пока нет работы с памятью)
 for y in range(world_size_chunk_y):
     for x in range(world_size_chunk_x):
@@ -239,21 +268,20 @@ while not finished:
     screen.blit(textures['cur_happy'], (20, 20))
     screen.blit(textures['cur_money'], (res[0]-420, 20))
 
-    happy = 0
-    money = 0
+    happy = mouse_x
+    money = mouse_y
 
 
-    text_1 = font.render(f'{happy}', 1, (217, 255, 76))
-    screen.blit(text_1, (320, 45))
-    text_2 = font.render(f'{money}', 1, (240, 175, 14))
-    screen.blit(text_2, (res[0] - 120, 45))
-
+    text_1 = font.render(f'x = {happy}', 1, (217, 255, 76))
+    screen.blit(text_1, (300, 45))
+    text_2 = font.render(f'y = {money}', 1, (240, 175, 14))
+    screen.blit(text_2, (res[0] - 200, 45))
     window.blit(pygame.transform.scale(screen, res), (0, 0))
-    if menu_flag:
-        pygame.draw.rect(window, WHITE, pygame.Rect(res[0]/2 - 650/2, res[1]/2 - 450, 650, 800))
 
-
-    pygame.display.update()
+    # if menu.flag:
+    #     pygame.draw.rect(window, WHITE, pygame.Rect(res[0]/2 - 650/2, res[1]/2 - 450, 650, 800))
+    if Menu.flag:
+        Menu.render()
 
     #обработка событий
     for event in pygame.event.get():
@@ -262,7 +290,7 @@ while not finished:
             finished = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                if menu_flag == False:
+                if Menu.flag == False:
                     #делаем сохранение
 
                     chuncks_file.close()
@@ -280,20 +308,20 @@ while not finished:
                     #закрываем программу
                     finished = True
                 else:
-                    close_menu()
+                    Menu.close_menu()
 #обработка нажатия мыши
         elif event.type == pygame.MOUSEBUTTONDOWN:
             #ЛКМ
             if event.button == 1:
                 #проверка типа нажатого тейла и соответсвующая обработка события
-                if menu_flag:
+                if Menu.flag:
                     #нажатие при открытом меню
                     print(mouse_x, mouse_y)
-                elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not menu_flag:
+                elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not Menu.flag:
                     #вызов меню при нажатии по чанку
-                    open_menu(chuncks_types[mouse_on_chunk_number])
+                    Menu.open_menu()
                     print(chuncks_types[mouse_on_chunk_number])
-
+    pygame.display.update()
 
 
 pygame.quit()
