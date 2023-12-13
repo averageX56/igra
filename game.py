@@ -5,7 +5,6 @@ import random
 import time
 from tkinter import *
 from tkinter import messagebox
-import os
 
 
 FPS = 60
@@ -19,25 +18,24 @@ random_event_timer = -500
 WHITE = 0xFFFFFF
 
 cam_x, cam_y = 0, 0
-res = [1536, 960]
-print(pygame.RESIZABLE)
-menu_flag=False
+res = [1540, 960]
+menu_flag = False
+
 
 pygame.init()
+font = pygame.font.Font('font.ttf', 60)
 mouse_x, mouse_y = pygame.mouse.get_pos()
-textures = dict()
-
-
+textures = dict()         # Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
 for i in range(625):
-    textures[i] = pygame.image.load((f'images\\{i}.png'))
-
+    textures[i] = pygame.image.load((f'images/{i}.png'))
+textures['cur_happy'] = pygame.image.load((f'images/cur_happy.png'))
+textures['cur_money'] = pygame.image.load((f'images/cur_money.png'))
 
 world_size_chunk_x = 25//chunk_size
 world_size_chunk_y = 25//chunk_size
 
 
-#Функция нормас работает
-#chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране
+#chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране (остальные не прорисовываем для оптимизации)
 def chunks_on_screen():
     x1 = cam_x//(chunk_size*tile_size)
     y1 = cam_y//(chunk_size*tile_size)
@@ -110,6 +108,8 @@ class Chunk():
             for x in range(chunk_size):
                 texture = textures[texture_code]
                 screen.blit(texture, (self.x + x*tile_size - cam_x, self.y + y*tile_size - cam_y))
+
+
 
 class Building():
     def __init__(self):
@@ -236,9 +236,23 @@ while not finished:
     #рендерим чанки, которые отображаются на экране
     for i in chunks_on_screen():
         chunks[i].render(chuncks_texture_codes[i])
+    screen.blit(textures['cur_happy'], (20, 20))
+    screen.blit(textures['cur_money'], (res[0]-420, 20))
+
+    happy = 0
+    money = 0
+
+
+    text_1 = font.render(f'{happy}', 1, (217, 255, 76))
+    screen.blit(text_1, (320, 45))
+    text_2 = font.render(f'{money}', 1, (240, 175, 14))
+    screen.blit(text_2, (res[0] - 120, 45))
+
     window.blit(pygame.transform.scale(screen, res), (0, 0))
     if menu_flag:
         pygame.draw.rect(window, WHITE, pygame.Rect(res[0]/2 - 650/2, res[1]/2 - 450, 650, 800))
+
+
     pygame.display.update()
 
     #обработка событий
@@ -278,6 +292,8 @@ while not finished:
                 elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not menu_flag:
                     #вызов меню при нажатии по чанку
                     open_menu(chuncks_types[mouse_on_chunk_number])
+                    print(chuncks_types[mouse_on_chunk_number])
+
 
 
 pygame.quit()
