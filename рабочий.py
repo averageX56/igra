@@ -34,6 +34,15 @@ building_textures_std = [['GK1','GK2','GK3','GK4','GK5','GK6','GK7','GK8','GK9']
                          ['NK1','NK2','NK3','NK4','NK5','NK6','NK7','NK8','NK9'],
                          ['ARKTICA1','ARKTICA2','ARKTICA3','ARKTICA4','ARKTICA5','ARKTICA6','ARKTICA7','ARKTICA8','ARKTICA9'],
                          ['KPM1','KPM2','KPM3','KPM4','KPM5','KPM6','KPM7','KPM8','KPM9']]
+building_textures_hs_right = [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i in range(1,5)]
+building_textures_hs_right.append(['sport11','sport12','sport13','sport14'])
+building_textures_hs_right += [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i in range(5,8)]
+building_textures_hs_right.append(['sport01','sport02','sport03','sport04'])
+building_textures_hs_left = [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i in range(8,12)]
+building_textures_hs_left.append(['sport21','sport22','sport23','sport24'])
+building_textures_hs_left += [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i in range(12,15)]
+building_textures_hs_left.append(['food11','food12','food13','food14'])
+building_textures_food = [[x + str(j) for j in range(1, 5)] for x in ['KSP', 'shop', 'food1', 'food2']]
 open_chuncks = ['std1','std2','std3','std4','std5','std6','shop1','shop2','food1','food2','hs1','hs2','hs3','hs4','hs5','hs6','hs7','hs8','hs9','hs10','hs11','hs12','hs13','hs14','hs15','hs16','hs17','hs18']
 
 def obnul():

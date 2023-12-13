@@ -31,15 +31,15 @@ textures['cur_happy'] = pygame.image.load('images\\cur_happy.png')
 textures['cur_money'] = pygame.image.load('images\\cur_money.png')
 textures['std'] = pygame.image.load('images\\shop_learn.png')
 textures['food'] = pygame.image.load('images\\shop_up.png')
-textures['base_left'] = pygame.image.load('images\\shop_down_left.png')
-textures['base_right'] = pygame.image.load('images\\shop_down_right.png')
+textures['hs_left'] = pygame.image.load('images\\shop_down_left.png')
+textures['hs_right'] = pygame.image.load('images\\shop_down_right.png')
 for t in ['GK', 'KPM', 'NK', 'LK','ARKTICA', 'CIFRA']:
     for r in range(1, 10):
         textures[t+str(r)] = pygame.image.load('images\\'+t+'_0'+str(r)+'.jpg')
 for i in range(1, 15):
     for j in range(1, 5):
         textures['dm' + str(i) + '_' + str(j)] = pygame.image.load('images\\dorm'+str(i)+'_0'+str(j+int(j > 2))+'.jpg')
-for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2']:
+for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2', 'KSP']:
     for j in range(1, 5):
         textures[i+str(j)] = pygame.image.load('images\\' + i + '_0' + str(j+int(j>2))+'.jpg')
 
@@ -116,14 +116,30 @@ def build(Menu):
         new_textures = building_textures_std[point - 1 - 2 * int(point > 3)]
         std_massive[point] = True
         std_mas[point - 1 - 2 * int(point > 3)] = 1
-        for x in buldings:
-            if just_menu_chunck in x:
-                just_bulding = x
-                break
-        k = 0
-        for i in just_bulding:
-            chuncks_texture_codes[i] = new_textures[k]
-            k += 1
+    elif type == 'hs_right':
+        global hs_right_massive
+        new_textures = building_textures_hs_right[point - 1]
+        hs_right_massive[point] = True
+        hs_right_mas[point - 1] = 1
+    elif type == 'hs_left':
+        global hs_left_massive
+        new_textures = building_textures_hs_left[point - 1]
+        hs_left_massive[point] = True
+        hs_left_mas[point - 1] = 1
+    elif type == 'food':
+        print('abba')
+        global food_massive
+        new_textures = building_textures_food[point - 1 - 3 * int(point > 3)]
+        food_massive[point] = True
+        food_mas[point - 1 - 3 * int(point > 3)] = 1
+    for x in buldings:
+        if just_menu_chunck in x:
+            just_bulding = x
+            break
+    k = 0
+    for i in just_bulding:
+        chuncks_texture_codes[i] = new_textures[k]
+        k += 1
 
 
 
@@ -142,14 +158,12 @@ class Menu():
         self.flag = True
         if 'std' in chuncks_types[mouse_on_chunk_number]:
             self.type = 'std'
-        elif 'food' in chuncks_types[mouse_on_chunk_number]:
+        elif ('food' in chuncks_types[mouse_on_chunk_number]) or ('shop' in chuncks_types[mouse_on_chunk_number]):
             self.type = 'food'
-        elif 'shop' in chuncks_types[mouse_on_chunk_number]:
-            self.type = 'shop'
         elif 'hs' in chuncks_types[mouse_on_chunk_number] and len(chuncks_types[mouse_on_chunk_number]) == 4:
-            self.type = 'base_left'
+            self.type = 'hs_left'
         elif 'hs' in chuncks_types[mouse_on_chunk_number] and len(chuncks_types[mouse_on_chunk_number]) == 3:
-            self.type = 'base_right'
+            self.type = 'hs_right'
 
     def render(self):
         if self.flag is True:
@@ -159,11 +173,11 @@ class Menu():
             if self.type == 'food':
                 screen.blit(textures['food'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
-            if self.type == 'base_left':
-                screen.blit(textures['base_left'], (self.x, self.y))
+            if self.type == 'hs_left':
+                screen.blit(textures['hs_left'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
-            if self.type == 'base_right':
-                screen.blit(textures['base_right'], (self.x, self.y))
+            if self.type == 'hs_right':
+                screen.blit(textures['hs_right'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
 
     def point_detect(self):
@@ -198,7 +212,28 @@ class Menu():
                     print('built')
                 else:
                     print('not built')
-                    build(self, )
+                    build(self)
+        elif self.type == 'hs_right':
+            if self.chosen_point in hs_right_massive:
+                if hs_right_massive[self.chosen_point] == True:
+                    print('built')
+                else:
+                    print('not built')
+                    build(self)
+        elif self.type == 'hs_left':
+            if self.chosen_point in hs_left_massive:
+                if hs_left_massive[self.chosen_point] == True:
+                    print('built')
+                else:
+                    print('not built')
+                    build(self)
+        elif self.type == 'food':
+            if self.chosen_point in food_massive:
+                if food_massive[self.chosen_point] == True:
+                    print('built')
+                else:
+                    print('not built')
+                    build(self)
 
 class Building:
     def __init__(self):
@@ -280,16 +315,33 @@ chuncks_file.close()
 #Чтение файла с общей информацией
 info_file = open('game_info.txt', 'r')
 std_mas = list(map(bool, list(map(int, info_file.readline().split()))))
+hs_right_mas = list(map(bool, list(map(int, info_file.readline().split()))))
+hs_left_mas = list(map(bool, list(map(int, info_file.readline().split()))))
+food_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 rnd_events_list = info_file.readline().split()
 info_file.close()
 std_massive = dict()
+hs_right_massive = dict()
+hs_left_massive = dict()
+food_massive = dict()
 balance = 0
 c = 0
-print(std_mas)
 for i in [1, 2, 3, 6, 7, 8]:
     std_massive[i] = std_mas[c]
     c += 1
-print(std_massive)
+c = 0
+for i in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+    hs_right_massive[i] = hs_right_mas[c]
+    c += 1
+c = 0
+for i in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+    hs_left_massive[i] = hs_left_mas[c]
+    c += 1
+c = 0
+for i in [1, 2, 6, 7]:
+    food_massive[i] = food_mas[c]
+    c += 1
+
 
 
 window = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
@@ -379,6 +431,15 @@ while not finished:
                     info_file.seek(0)
                     for i in range(len(std_mas)):
                         info_file.write(str(int(std_mas[i])) + ' ')
+                    info_file.write('\n')
+                    for i in range(len(hs_right_mas)):
+                        info_file.write(str(int(hs_right_mas[i])) + ' ')
+                    info_file.write('\n')
+                    for i in range(len(hs_left_mas)):
+                        info_file.write(str(int(hs_left_mas[i])) + ' ')
+                    info_file.write('\n')
+                    for i in range(len(food_mas)):
+                        info_file.write(str(int(food_mas[i])) + ' ')
                     info_file.close()
 
 
