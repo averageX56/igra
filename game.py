@@ -1,10 +1,6 @@
 import pygame
 from рабочий import *
-import math
 import random
-import time
-from tkinter import *
-from tkinter import messagebox
 
 
 FPS = 60
@@ -106,34 +102,34 @@ class Menu:
     def build(self):
 
         global money, just_menu_chunck
-        if self.type == 'std' and money > cost[0][self.chosen_point]:
+        if self.type == 'std' and money > cost[0][self.chosen_point - 1]:
             global std_massive
             new_textures = building_textures_std[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)]
             std_massive[self.chosen_point] = True
             std_mas[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)] = 1
             Learn.built += 1
-            money -= cost[0][self.chosen_point]
-        elif self.type == 'hs_right' and money > cost[1][self.chosen_point]:
+            money -= cost[0][self.chosen_point - 1]
+        elif self.type == 'hs_right' and money > cost[1][self.chosen_point - 1]:
             global hs_right_massive
             new_textures = building_textures_hs_right[self.chosen_point - 1]
             hs_right_massive[self.chosen_point] = True
             hs_right_mas[self.chosen_point - 1] = 1
             Dorm2.built += 1
-            money -= cost[1][self.chosen_point]
-        elif self.type == 'hs_left' and money > cost[2][self.chosen_point]:
+            money -= cost[1][self.chosen_point - 1]
+        elif self.type == 'hs_left' and money > cost[2][self.chosen_point - 1]:
             global hs_left_massive
             new_textures = building_textures_hs_left[self.chosen_point - 1]
             hs_left_massive[self.chosen_point] = True
             hs_left_mas[self.chosen_point - 1] = 1
             Dorm1.built += 1
-            money -= cost[2][self.chosen_point]
-        elif self.type == 'food' and money > cost[3][self.chosen_point]:
+            money -= cost[2][self.chosen_point - 1]
+        elif self.type == 'food' and money > cost[3][self.chosen_point - 1]:
             global food_massive
             new_textures = building_textures_food[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)]
             food_massive[self.chosen_point] = True
             food_mas[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)] = 1
             Foodc.built += 1
-            money -= cost[3][self.chosen_point]
+            money -= cost[3][self.chosen_point - 1]
         for x in buldings:
             if just_menu_chunck in x:
                 just_bulding = x
@@ -393,10 +389,10 @@ while not finished:
     Dorm2.money_exsc()
     Learn.money_exsc()
     Foodc.money_exsc()
-    text_1 = font.render(f'x = {round(happy)}', 1, (217, 255, 76))
-    screen.blit(text_1, (260, 45))
-    text_2 = font.render(f'y = {round(money)}', 1, (240, 175, 14))
-    screen.blit(text_2, (res[0] - 180, 45))
+    text_1 = font.render(f'{round(happy)}', 1, (217, 255, 76))
+    screen.blit(text_1, (300, 45))
+    text_2 = font.render(f'{round(money)}', 1, (240, 175, 14))
+    screen.blit(text_2, (res[0] - 160, 45))
     window.blit(pygame.transform.scale(screen, res), (0, 0))
 
     if Menu.flag:
