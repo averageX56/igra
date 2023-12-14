@@ -7,7 +7,7 @@ FPS = 60
 
 chunk_size = 1
 tile_size = 150
-cam_speed = 15
+cam_speed = 150
 random_event_timer = -500
 
 WHITE = 0xFFFFFF
@@ -32,6 +32,10 @@ textures['std'] = pygame.image.load('images\\shop_learn.png')
 textures['food'] = pygame.image.load('images\\shop_up.jpg')
 textures['hs_left'] = pygame.image.load('images\\shop_down_left.png')
 textures['hs_right'] = pygame.image.load('images\\shop_down_right.png')
+textures['projects'] = pygame.image.load('images\\projects.jpg')
+textures['not_ready'] = pygame.image.load('images\\projects_unavailable.jpg')
+text_00 = font.render('Чтобы получить доступ к меню проектов \n постройте все учебные корпуса', 1, (0, 0, 255))
+text_0 = font.render('Меню проектов', 1, (0, 0, 255))
 for t in ['GK', 'KPM', 'NK', 'LK', 'ARKTICA', 'CIFRA']:
     for r in range(1, 10):
         textures[t+str(r)] = pygame.image.load('images\\'+t+'_0'+str(r)+'.jpg')
@@ -71,7 +75,7 @@ class Chunk:
     """
     класс чанка - квадрат на экране размером 150 * 150 пикселей
     """
-    def __init__(self, x, y, type='map'):
+    def __init__(self, x, y, type = 'map'):
         """
         :param x: координата x левого верхнего края чанка
         :param y: координата y левого верхнего края чанка
@@ -222,6 +226,37 @@ class Menu:
                     print('not built')
                     self.build()
 
+class Project_menu:
+    def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
+        self.x = m_x
+        self.y = m_y
+        self.flag = False
+        self.type = 0
+        self.chosen_point = 0
+
+    def close_menu(self):
+        self.flag = False
+
+    def open_menu(self):
+        self.flag = True
+        if Learn.count == 6:
+            self.type = 'ready'
+        else:
+            self.type = 'not ready'
+
+    def render(self):
+        a = 200
+        b = 200
+        screen.blit(text_0, (a, b))
+        window.blit(pygame.transform.scale(screen, res), (0, 0))
+        if self.flag is True:
+            if self.type == 'ready':
+                screen.blit(textures['projects'], (self.x, self.y))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
+            if self.type == 'not ready':
+                screen.blit(textures['not_ready'], (self.x, self.y))
+                screen.blit(text_00, (400, 400))
+                window.blit(pygame.transform.scale(screen, res), (0, 0))
 
 class Building:
     def __init__(self):
@@ -233,8 +268,8 @@ class Building:
 
     def money_exsc(self):
         global money, happy
-        money += (self.income - self.outcome) * self.built
-        happy += self.happy * self.built
+        money += (self.income - self.outcome) * self.built * 0.1
+        happy += self.happy * self.built * 0.1
 
 
     # Функция обработки случайного события
@@ -273,7 +308,7 @@ class Foodbuild(Building):
         self.built = 0
         self.income = 0.5
         self.outcome = 0.1
-        self.happy = 0.03
+        self.happy = 0
 
 
 class Learn_build(Building):
@@ -337,6 +372,7 @@ chosen_x, chosen_y = 0, 0
 money = 2000
 happy = 1000
 Menu = Menu()
+pr = Project_menu()
 Dorm1 = Dormitory1()
 Dorm2 = Dormitory2()
 Learn = Learn_build()
@@ -358,10 +394,13 @@ while not finished:
     if random_event_timer == 1200:
         rnd_num = random.randint(1, 32)
         # Обработка случайного события
-        random_event(rnd_num)
+        Dorm1.random_event()
         random_event_timer = 0
-    screen.fill(WHITE)
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    Dorm1.money_exsc()
+    Dorm2.money_exsc()
+    Learn.money_exsc()
+    Foodc.money_exsc()
     mouse_on_chunk_x, mouse_on_chunk_y = ((mouse_x + cam_x)//tile_size, (mouse_y + cam_y)//tile_size)
     mouse_on_chunk_number = mouse_on_chunk_y * 25 + mouse_on_chunk_x
 
@@ -384,19 +423,15 @@ while not finished:
     for i in chunks_on_screen():
         chunks[i].render(chuncks_texture_codes[i])
     screen.blit(textures['cur_happy'], (20, 20))
-    screen.blit(textures['cur_money'], (res[0]-420, 20))
-    Dorm1.money_exsc()
-    Dorm2.money_exsc()
-    Learn.money_exsc()
-    Foodc.money_exsc()
+    screen.blit(textures['cur_money'], (res[0] - 420, 20))
     text_1 = font.render(f'{round(happy)}', 1, (217, 255, 76))
     screen.blit(text_1, (300, 45))
     text_2 = font.render(f'{round(money)}', 1, (240, 175, 14))
     screen.blit(text_2, (res[0] - 160, 45))
+    pr.render()
+    Menu.render()
     window.blit(pygame.transform.scale(screen, res), (0, 0))
 
-    if Menu.flag:
-        Menu.render()
 
     # Обработка событий
     for event in pygame.event.get():
@@ -448,6 +483,8 @@ while not finished:
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
                     print(chuncks_types[mouse_on_chunk_number])
+                elif mouse_x in range(a - 30, a + 30) and mouse_y in range(b - 20, b + 20) and not pr.flag:
+                    pr.open_menu()
     pygame.display.update()
 
 pygame.quit()
