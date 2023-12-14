@@ -24,16 +24,20 @@ menu_flag = False
 pygame.init()
 font = pygame.font.Font('font.ttf', 60)
 mouse_x, mouse_y = pygame.mouse.get_pos()
-textures = dict()         # Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
+world_size_chunk_x = 25//chunk_size
+world_size_chunk_y = 25//chunk_size
+
+# Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
+textures = dict()
 for i in range(625):
     textures[str(i)] = pygame.image.load(f'images/{i}.png')
 textures['cur_happy'] = pygame.image.load('images\\cur_happy.png')
 textures['cur_money'] = pygame.image.load('images\\cur_money.png')
 textures['std'] = pygame.image.load('images\\shop_learn.png')
-textures['food'] = pygame.image.load('images\\shop_up.png')
+textures['food'] = pygame.image.load('images\\shop_up.jpg')
 textures['hs_left'] = pygame.image.load('images\\shop_down_left.png')
 textures['hs_right'] = pygame.image.load('images\\shop_down_right.png')
-for t in ['GK', 'KPM', 'NK', 'LK','ARKTICA', 'CIFRA']:
+for t in ['GK', 'KPM', 'NK', 'LK', 'ARKTICA', 'CIFRA']:
     for r in range(1, 10):
         textures[t+str(r)] = pygame.image.load('images\\'+t+'_0'+str(r)+'.jpg')
 for i in range(1, 15):
@@ -41,18 +45,13 @@ for i in range(1, 15):
         textures['dm' + str(i) + '_' + str(j)] = pygame.image.load('images\\dorm'+str(i)+'_0'+str(j+int(j > 2))+'.jpg')
 for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2', 'KSP']:
     for j in range(1, 5):
-        textures[i+str(j)] = pygame.image.load('images\\' + i + '_0' + str(j+int(j>2))+'.jpg')
+        textures[i+str(j)] = pygame.image.load('images\\' + i + '_0' + str(j+int(j > 2))+'.jpg')
 
-
-world_size_chunk_x = 25//chunk_size
-world_size_chunk_y = 25//chunk_size
-
-
-##chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране
+# chunck_on_screen() по положению камеры определяет, какие чанки из имеющихся нужно прорисовать на экране
 def chunks_on_screen():
-    '''
+    """
     :return: список чанков, которые в данный момент изображены на экране
-    '''
+    """
     x1 = cam_x // (chunk_size * tile_size)
     y1 = cam_y // (chunk_size * tile_size)
 
@@ -71,80 +70,30 @@ def chunks_on_screen():
             result.append(x+y*world_size_chunk_x)
     return result
 
-#Функция обработки случайного события
-def random_event(key):
-    '''
-    :param key: случайное число, от которого зависит произошедшее событие
-    :return: в зависимости от key брабатывает случайное событие
-    '''
-    if key not in rnd_events_list:
-        pass
-    else:
-        if key == 1:
-            print(1)
-        elif key == 2:
-            print(2)
 
-
-class Chunk():
-    '''
+class Chunk:
+    """
     класс чанка - квадрат на экране размером 150 * 150 пикселей
-    '''
+    """
     def __init__(self, x, y, type='map'):
-        '''
+        """
         :param x: координата x левого верхнего края чанка
         :param y: координата y левого верхнего края чанка
         :param type: тип чанка. используется для обработки нажатий на чанк
-        '''
+        """
         self.x, self.y = x, y
         self.type = type
 
     def render(self, texture_code):
-        '''
+        """
         :param texture_code: код чанка
         :return: отрисовывает чанк на экране с текстурой, соответсвующей коду чанка
-        '''
+        """
         texture = textures[texture_code]
         screen.blit(texture, (self.x - cam_x, self.y - cam_y))
 
-def build(Menu):
-    global balance, just_menu_chunck
-    type = Menu.type
-    point = Menu.chosen_point
-    if type == 'std':
-        global std_massive
-        new_textures = building_textures_std[point - 1 - 2 * int(point > 3)]
-        std_massive[point] = True
-        std_mas[point - 1 - 2 * int(point > 3)] = 1
-    elif type == 'hs_right':
-        global hs_right_massive
-        new_textures = building_textures_hs_right[point - 1]
-        hs_right_massive[point] = True
-        hs_right_mas[point - 1] = 1
-    elif type == 'hs_left':
-        global hs_left_massive
-        new_textures = building_textures_hs_left[point - 1]
-        hs_left_massive[point] = True
-        hs_left_mas[point - 1] = 1
-    elif type == 'food':
-        print('abba')
-        global food_massive
-        new_textures = building_textures_food[point - 1 - 3 * int(point > 3)]
-        food_massive[point] = True
-        food_mas[point - 1 - 3 * int(point > 3)] = 1
-    for x in buldings:
-        if just_menu_chunck in x:
-            just_bulding = x
-            break
-    k = 0
-    for i in just_bulding:
-        chuncks_texture_codes[i] = new_textures[k]
-        k += 1
 
-
-
-
-class Menu():
+class Menu:
     def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
         self.x, self.y = m_x, m_y
         self.flag = False
@@ -153,6 +102,46 @@ class Menu():
 
     def close_menu(self):
         self.flag = False
+
+    def build(self):
+
+        global money, just_menu_chunck
+        if self.type == 'std' and money > cost[0][self.chosen_point]:
+            global std_massive
+            new_textures = building_textures_std[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)]
+            std_massive[self.chosen_point] = True
+            std_mas[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)] = 1
+            Learn.built += 1
+            money -= cost[0][self.chosen_point]
+        elif self.type == 'hs_right' and money > cost[1][self.chosen_point]:
+            global hs_right_massive
+            new_textures = building_textures_hs_right[self.chosen_point - 1]
+            hs_right_massive[self.chosen_point] = True
+            hs_right_mas[self.chosen_point - 1] = 1
+            Dorm2.built += 1
+            money -= cost[1][self.chosen_point]
+        elif self.type == 'hs_left' and money > cost[2][self.chosen_point]:
+            global hs_left_massive
+            new_textures = building_textures_hs_left[self.chosen_point - 1]
+            hs_left_massive[self.chosen_point] = True
+            hs_left_mas[self.chosen_point - 1] = 1
+            Dorm1.built += 1
+            money -= cost[2][self.chosen_point]
+        elif self.type == 'food' and money > cost[3][self.chosen_point]:
+            global food_massive
+            new_textures = building_textures_food[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)]
+            food_massive[self.chosen_point] = True
+            food_mas[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)] = 1
+            Foodc.built += 1
+            money -= cost[3][self.chosen_point]
+        for x in buldings:
+            if just_menu_chunck in x:
+                just_bulding = x
+                break
+        k = 0
+        for i in just_bulding:
+            chuncks_texture_codes[i] = new_textures[k]
+            k += 1
 
     def open_menu(self):
         self.flag = True
@@ -180,7 +169,7 @@ class Menu():
                 screen.blit(textures['hs_right'], (self.x, self.y))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
 
-    def point_detect(self):
+    def __point_detect(self):
         global chosen_x, chosen_y
         print(self.chosen_point)
         if chosen_x in range(470, 738):
@@ -205,35 +194,38 @@ class Menu():
                 self.chosen_point = 9
             elif chosen_y in range(560, 610):
                 self.chosen_point = 10
+
     def processing_click(self):
+        self.__point_detect()
         if self.type == 'std':
             if self.chosen_point in std_massive:
-                if std_massive[self.chosen_point] == True:
+                if std_massive[self.chosen_point] is True:
                     print('built')
                 else:
                     print('not built')
-                    build(self)
+                    self.build()
         elif self.type == 'hs_right':
             if self.chosen_point in hs_right_massive:
-                if hs_right_massive[self.chosen_point] == True:
+                if hs_right_massive[self.chosen_point] is True:
                     print('built')
                 else:
                     print('not built')
-                    build(self)
+                    self.build()
         elif self.type == 'hs_left':
             if self.chosen_point in hs_left_massive:
-                if hs_left_massive[self.chosen_point] == True:
+                if hs_left_massive[self.chosen_point] is True:
                     print('built')
                 else:
                     print('not built')
-                    build(self)
+                    self.build()
         elif self.type == 'food':
             if self.chosen_point in food_massive:
-                if food_massive[self.chosen_point] == True:
+                if food_massive[self.chosen_point] is True:
                     print('built')
                 else:
                     print('not built')
-                    build(self)
+                    self.build()
+
 
 class Building:
     def __init__(self):
@@ -241,6 +233,7 @@ class Building:
         self.outcome = 0
         self.happy = 0
         self.built = 0
+        self.key = 0
 
     def money_exsc(self):
         global money, happy
@@ -250,6 +243,19 @@ class Building:
     def build_new(self):
         self.built += 1
 
+    # Функция обработки случайного события
+    def random_event(self):
+        """
+        :param key: случайное число, от которого зависит произошедшее событие
+        :return: в зависимости от key брабатывает случайное событие
+        """
+        if self.key not in rnd_events_list:
+            pass
+        else:
+            if self.key == 1:
+                print(1)
+            elif self.key == 2:
+                print(2)
 
 class Dorm1(Building):
     def __init__(self):
@@ -265,14 +271,6 @@ class Dorm2(Building):
         self.income = 0.6
         self.outcome = 0.01
         self.happy = -0.05
-
-
-class Dorm3(Building):
-    def __init__(self):
-        Building.__init__(self, self.built)
-        self.income = 0.2
-        self.outcome = 0.01
-        self.happy = 0
 
 
 class Foodc(Building):
@@ -301,7 +299,7 @@ class Learn(Building):
 
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
-#Чтение файла с кодами текстур чанков из памяти
+# Чтение файла с кодами текстур чанков из памяти
 chuncks_file = open('chuncks.txt', 'r')
 chuncks_texture_codes = []
 chuncks_types = []
@@ -312,7 +310,7 @@ for i in range(625):
     chuncks_types.append(just_type)
 chuncks_file.close()
 
-#Чтение файла с общей информацией
+# Чтение файла с общей информацией
 info_file = open('game_info.txt', 'r')
 std_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 hs_right_mas = list(map(bool, list(map(int, info_file.readline().split()))))
@@ -343,7 +341,6 @@ for i in [1, 2, 6, 7]:
     c += 1
 
 
-
 window = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 fullscreen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 screen = pygame.transform.scale(window, res)
@@ -352,7 +349,7 @@ clock = pygame.time.Clock()
 chunks = []
 chosen_x, chosen_y = 0, 0
 Menu = Menu()
-#создаём все чанки(пока нет работы с памятью)
+# Создаём все чанки(пока нет работы с памятью)
 for y in range(world_size_chunk_y):
     for x in range(world_size_chunk_x):
         chunks.append(Chunk(x*chunk_size*tile_size, y*chunk_size*tile_size))
@@ -367,7 +364,7 @@ while not finished:
     random_event_timer += 1
     if random_event_timer == 1200:
         rnd_num = random.randint(1, 32)
-        #Обработка случайного события
+        # Обработка случайного события
         random_event(rnd_num)
         random_event_timer = 0
     screen.fill(WHITE)
@@ -375,7 +372,7 @@ while not finished:
     mouse_on_chunk_x, mouse_on_chunk_y = ((mouse_x + cam_x)//tile_size, (mouse_y + cam_y)//tile_size)
     mouse_on_chunk_number = mouse_on_chunk_y * 25 + mouse_on_chunk_x
 
-    #обработка зажатых клавиш
+    # Обработка зажатых клавиш
     key = pygame.key.get_pressed()
     if key[pygame.K_a]:
         if cam_x >= 15:
@@ -390,7 +387,7 @@ while not finished:
         if cam_y <= world_size_chunk_y * tile_size - res[1] - cam_speed:
             cam_y += cam_speed
 
-    #рендерим чанки, которые отображаются на экране
+    # Рендерим чанки, которые отображаются на экране
     for i in chunks_on_screen():
         chunks[i].render(chuncks_texture_codes[i])
     screen.blit(textures['cur_happy'], (20, 20))
@@ -410,7 +407,7 @@ while not finished:
     if Menu.flag:
         Menu.render()
 
-    #обработка событий
+    # Обработка событий
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             chuncks_file.close()
@@ -418,7 +415,7 @@ while not finished:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 if Menu.flag is False:
-                    #делаем сохранение
+                    # Делаем сохранение
 
                     chuncks_file.close()
                     chuncks_file = open('chuncks.txt', 'w')
@@ -442,23 +439,21 @@ while not finished:
                         info_file.write(str(int(food_mas[i])) + ' ')
                     info_file.close()
 
-
-                    #закрываем программу
+                    # Закрываем программу
                     finished = True
                 else:
                     Menu.close_menu()
-#обработка нажатия мыши
+# Обработка нажатия мыши
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            #ЛКМ
+            # ЛКМ
             if event.button == 1:
-                #проверка типа нажатого тейла и соответсвующая обработка события
+                # Проверка типа нажатого тейла и соответсвующая обработка события
                 if Menu.flag:
-                    #нажатие при открытом меню
+                    # Нажатие при открытом меню
                     chosen_x, chosen_y = mouse_x, mouse_y
-                    Menu.point_detect()
                     Menu.processing_click()
                 elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not Menu.flag:
-                    #вызов меню при нажатии по чанку
+                    # Вызов меню при нажатии по чанку
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
                     print(chuncks_types[mouse_on_chunk_number])
