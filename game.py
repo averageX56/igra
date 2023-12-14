@@ -545,6 +545,7 @@ while not finished:
                     # Нажатие при открытом меню
                     chosen_x, chosen_y = mouse_x, mouse_y
                     Menu.processing_click()
+                    pr.projecting()
                 elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not Menu.flag:
                     # Вызов меню при нажатии по чанку
                     Menu.open_menu()
