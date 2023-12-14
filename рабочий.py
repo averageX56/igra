@@ -42,7 +42,7 @@ building_textures_hs_left = [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i 
 building_textures_hs_left.append(['sport21','sport22','sport23','sport24'])
 building_textures_hs_left += [['dm'+str(i)+'_'+str(j) for j in range(1,5)] for i in range(12,15)]
 building_textures_hs_left.append(['food11','food12','food13','food14'])
-building_textures_food = [[x + str(j) for j in range(1, 5)] for x in ['KSP', 'shop', 'food1', 'food2']]
+building_textures_food = [[x + str(j) for j in range(1, 5)] for x in ['KSP', 'shop', 'food3', 'food2']]
 open_chuncks = ['std1','std2','std3','std4','std5','std6','shop1','shop2','food1','food2','hs1','hs2','hs3','hs4','hs5','hs6','hs7','hs8','hs9','hs10','hs11','hs12','hs13','hs14','hs15','hs16','hs17','hs18']
 
 def obnul():
@@ -107,5 +107,6 @@ def obnul():
         else:
             file.write(str(i) + '  map' + '\n')
     file.close()
+
 cost = [[1500, 1300, 1800, 1800, 1800, 1500, 1300, 1800, 1300, 1300], [400, 300, 350, 400, 750, 500, 666, 400, 700, 700], [400, 300, 350, 400, 750, 500, 666, 400, 700, 700], [700, 600, 0, 0, 0, 500, 500, 500, 500, 500], [15000, 24000, 0, 0, 0, 16000, 100000, 0, 0, 0]]
 #obnul()
