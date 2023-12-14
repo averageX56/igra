@@ -389,11 +389,6 @@ for i in range(len(chunks)):
 while not finished:
     clock.tick(FPS)
     random_event_timer += 1
-    if random_event_timer == 1200:
-        rnd_num = random.randint(1, 32)
-        # Обработка случайного события
-        Dorm1.random_event()
-        random_event_timer = 0
     mouse_x, mouse_y = pygame.mouse.get_pos()
     Dorm1.money_exsc()
     Dorm2.money_exsc()
