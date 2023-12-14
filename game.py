@@ -1,6 +1,5 @@
 import pygame
 from рабочий import *
-import random
 import time
 from tkinter import *
 from tkinter import messagebox
@@ -12,7 +11,6 @@ FPS = 60
 chunk_size = 1
 tile_size = 150
 cam_speed = 150
-random_event_timer = -500
 
 WHITE = 0xFFFFFF
 
@@ -111,60 +109,69 @@ class Menu:
         enough_money = False
         self.house=''
         global money, just_menu_chunck
-        if self.type == 'std' and money > cost[0][self.chosen_point - 1]:
-            global std_massive
-            new_textures = building_textures_std[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)]
-            std_massive[self.chosen_point] = True
-            std_mas[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)] = 1
-            Learn.built += 1
+        for x in buldings:
+            if just_menu_chunck in x:
+                just_bulding = x
+                number_building = buldings.index(just_bulding)
+                if closed_chuncks[number_building] == 1:
+                    closed_flag = True
+                else:
+                    closed_flag = False
+                    closed_chuncks[number_building] = 1
+                break
+        if not closed_flag:
+            if self.type == 'std' and money > cost[0][self.chosen_point - 1]:
+                global std_massive
+                new_textures = building_textures_std[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)]
+                std_massive[self.chosen_point] = True
+                std_mas[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)] = 1
+                Learn.built += 1
 
-            money -= cost[0][self.chosen_point - 1]
-            enough_money = True
-            self.house = std_massive[self.chosen_point]
-        elif self.type == 'hs_right' and money > cost[1][self.chosen_point - 1]:
+                money -= cost[0][self.chosen_point - 1]
+                enough_money = True
+                self.house = std_massive[self.chosen_point]
+            elif self.type == 'hs_right' and money > cost[1][self.chosen_point - 1]:
 
-            global hs_right_massive
-            new_textures = building_textures_hs_right[self.chosen_point - 1]
-            hs_right_massive[self.chosen_point] = True
-            hs_right_mas[self.chosen_point - 1] = 1
-            Dorm2.built += 1
+                global hs_right_massive
+                new_textures = building_textures_hs_right[self.chosen_point - 1]
+                hs_right_massive[self.chosen_point] = True
+                hs_right_mas[self.chosen_point - 1] = 1
+                Dorm2.built += 1
 
-            money -= cost[1][self.chosen_point - 1]
-            enough_money = True
-            self.house = hs_right_massive[self.chosen_point]
-        elif self.type == 'hs_left' and money > cost[2][self.chosen_point - 1]:
+                money -= cost[1][self.chosen_point - 1]
+                enough_money = True
+                self.house = hs_right_massive[self.chosen_point]
+            elif self.type == 'hs_left' and money > cost[2][self.chosen_point - 1]:
 
-            global hs_left_massive
-            new_textures = building_textures_hs_left[self.chosen_point - 1]
-            hs_left_massive[self.chosen_point] = True
-            hs_left_mas[self.chosen_point - 1] = 1
-            Dorm1.built += 1
+                global hs_left_massive
+                new_textures = building_textures_hs_left[self.chosen_point - 1]
+                hs_left_massive[self.chosen_point] = True
+                hs_left_mas[self.chosen_point - 1] = 1
+                Dorm1.built += 1
 
-            money -= cost[2][self.chosen_point - 1]
-            enough_money = True
-            self.house = hs_left_massive[self.chosen_point]
-        elif self.type == 'food' and money > cost[3][self.chosen_point - 1]:
+                money -= cost[2][self.chosen_point - 1]
+                enough_money = True
+                self.house = hs_left_massive[self.chosen_point]
+            elif self.type == 'food' and money > cost[3][self.chosen_point - 1]:
 
-            global food_massive
-            new_textures = building_textures_food[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)]
-            food_massive[self.chosen_point] = True
-            food_mas[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)] = 1
-            Foodc.built += 1
+                global food_massive
+                new_textures = building_textures_food[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)]
+                food_massive[self.chosen_point] = True
+                food_mas[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)] = 1
+                Foodc.built += 1
 
-            money -= cost[3][self.chosen_point - 1]
-            enough_money = True
-            self.house = food_massive[self.chosen_point]
-        if enough_money:
-            for x in buldings:
-                if just_menu_chunck in x:
-                    just_bulding = x
-                    break
-            k = 0
-            for i in just_bulding:
-                chuncks_texture_codes[i] = new_textures[k]
-                k += 1
+                money -= cost[3][self.chosen_point - 1]
+                enough_money = True
+                self.house = food_massive[self.chosen_point]
+            if enough_money:
+                k = 0
+                for i in just_bulding:
+                    chuncks_texture_codes[i] = new_textures[k]
+                    k += 1
+            else:
+                messagebox.showinfo('CAMPSIM', 'Недостаточно средств для постройки')
         else:
-            messagebox.showinfo('CAMPSIM','Недостаточно средств для постройки')
+            messagebox.showinfo('CAMPSIM', 'Место уже занято')
 
 
     def open_menu(self):
@@ -256,7 +263,6 @@ class Project_menu:
         self.flag = False
         self.type = 0
         self.chosen_point = 0
-        self.projects = [0, 0, 0, 0]
 
     def close_menu(self):
         self.flag = False
@@ -279,6 +285,9 @@ class Project_menu:
                 screen.blit(textures['not_ready'], (self.x, self.y))
                 screen.blit(text_00, (525, 400))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
+            if a is True:
+                text_win = font.render('You win', 1, (255, 255, 255))
+                screen.blit(text_win, (res[0]/2 - 100, res[1]/2))
     def __point_detect(self):
         global chosen_x, chosen_y
         if chosen_x in range(470, 738):
@@ -305,20 +314,19 @@ class Project_menu:
                 self.chosen_point = 10
 
     def projecting(self):
-        global money
-        print(self.chosen_point)
+        global money, projects
         self.__point_detect()
         if self.chosen_point == 1 and money > cost[4][self.chosen_point - 1]:
-            self.projects[0] = 1
+            projects[0] = 1
             money -= cost[4][self.chosen_point - 1]
         elif self.chosen_point == 2 and money > cost[4][self.chosen_point - 1]:
-            self.projects[1] = 1
+            projects[1] = 1
             money -= cost[4][self.chosen_point - 1]
         elif self.chosen_point == 6 and money > cost[4][self.chosen_point - 1]:
-            self.projects[2] = 1
+            projects[2] = 1
             money -= cost[4][self.chosen_point - 1]
         elif self.chosen_point == 7 and money > cost[4][self.chosen_point - 1]:
-            self.projects[3] = 1
+            projects[3] = 1
             money -= cost[4][self.chosen_point - 1]
 
 class Building:
@@ -333,21 +341,6 @@ class Building:
         global money, happy
         money += (self.income - self.outcome) * self.built * 0.1
         happy += self.happy * self.built * 0.1
-
-
-    # Функция обработки случайного события
-    def random_event(self):
-        """
-        :param key: случайное число, от которого зависит произошедшее событие
-        :return: в зависимости от key брабатывает случайное событие
-        """
-        if self.key not in rnd_events_list:
-            pass
-        else:
-            if self.key == 1:
-                print(1)
-            elif self.key == 2:
-                print(2)
 
 
 class Dormitory1(Building):
@@ -394,6 +387,7 @@ Foodc = Foodbuild()
 chuncks_file = open('chuncks.txt', 'r')
 chuncks_texture_codes = []
 chuncks_types = []
+projects = [0, 0, 0, 0]
 for i in range(625):
     chunk_info = chuncks_file.readline()
     just_code, just_type = chunk_info.split()
@@ -409,6 +403,7 @@ hs_left_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 food_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 Dorm1.built, Dorm2.built, Learn.built, Foodc.built = list(map(int, info_file.readline().split()))
 money, happy = list(map(float, info_file.readline().split()))
+closed_chuncks = list(map(int, info_file.readline().split()))
 rnd_events_list = info_file.readline().split()
 info_file.close()
 std_massive = dict()
@@ -433,7 +428,6 @@ for i in [1, 2, 6, 7]:
     c += 1
 
 
-
 window = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 fullscreen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 screen = pygame.transform.scale(window, res)
@@ -454,7 +448,6 @@ for i in range(len(chunks)):
 
 while not finished:
     clock.tick(FPS)
-    random_event_timer += 1
     mouse_x, mouse_y = pygame.mouse.get_pos()
     Dorm1.money_exsc()
     Dorm2.money_exsc()
@@ -529,6 +522,9 @@ while not finished:
                     info_file.write('\n')
                     for i in [money, happy]:
                         info_file.write(str(i) + ' ')
+                    info_file.write('\n')
+                    for i in range(len(closed_chuncks)):
+                        info_file.write(str(closed_chuncks[i]) + ' ')
                     info_file.close()
 
                     # Закрываем программу
@@ -541,7 +537,7 @@ while not finished:
             # ЛКМ
             if event.button == 1:
                 # Проверка типа нажатого тейла и соответсвующая обработка события
-                if Menu.flag:
+                if Menu.flag or pr.flag:
                     # Нажатие при открытом меню
                     chosen_x, chosen_y = mouse_x, mouse_y
                     Menu.processing_click()
@@ -550,10 +546,10 @@ while not finished:
                     # Вызов меню при нажатии по чанку
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
-                    print(chuncks_types[mouse_on_chunk_number])
                 elif mouse_x in range(res[0] - 340, res[0]) and mouse_y in range(res[1] - 200, res[1] - 130) and not pr.flag:
                     pr.open_menu()
                     pr.render()
+    a = projects == [1, 1, 1, 1]
     pygame.display.update()
 
 pygame.quit()
