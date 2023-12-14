@@ -34,8 +34,8 @@ textures['hs_left'] = pygame.image.load('images\\shop_down_left.png')
 textures['hs_right'] = pygame.image.load('images\\shop_down_right.png')
 textures['projects'] = pygame.image.load('images\\projects.jpg')
 textures['not_ready'] = pygame.image.load('images\\projects_unavailable.jpg')
-text_00 = font.render('Чтобы получить доступ к меню проектов \n постройте все учебные корпуса', 1, (0, 0, 255))
-text_0 = font.render('Меню проектов', 1, (0, 0, 255))
+text_00 = font.render('To get access to projects \n you have to build all the buildings', 1, (0, 0, 255))
+text_0 = font.render('Project menu', 1, (0, 0, 255))
 for t in ['GK', 'KPM', 'NK', 'LK', 'ARKTICA', 'CIFRA']:
     for r in range(1, 10):
         textures[t+str(r)] = pygame.image.load('images\\'+t+'_0'+str(r)+'.jpg')
@@ -245,9 +245,7 @@ class Project_menu:
             self.type = 'not ready'
 
     def render(self):
-        a = 200
-        b = 200
-        screen.blit(text_0, (a, b))
+        screen.blit(text_0, (res[0] - 300, res[1] - 180))
         window.blit(pygame.transform.scale(screen, res), (0, 0))
         if self.flag is True:
             if self.type == 'ready':
@@ -483,8 +481,13 @@ while not finished:
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
                     print(chuncks_types[mouse_on_chunk_number])
-                elif mouse_x in range(a - 30, a + 30) and mouse_y in range(b - 20, b + 20) and not pr.flag:
+                elif mouse_x in range(res[0] - 340, res[0] - 260) and mouse_y in range(res[1] - 200, res[1] - 160) and not pr.flag:
                     pr.open_menu()
+
+    if money < -1000 or happy < 0:
+        loser_text = font.render('Ваш кампус погряз в долгах, а студенты несчастливы. Вы проиграли', 1, (255, 0, 0))
+        screen.blit(loser_text, (res[0]/2 - 330, res[1]/2 - 450))
+        finished = True
     pygame.display.update()
 
 pygame.quit()
