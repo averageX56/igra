@@ -18,7 +18,6 @@ WHITE = 0xFFFFFF
 
 cam_x, cam_y = 0, 0
 res = [1540, 960]
-menu_flag = False
 
 
 pygame.init()
@@ -399,7 +398,6 @@ while not finished:
     text_2 = font.render(f'y = {round(money)}', 1, (240, 175, 14))
     screen.blit(text_2, (res[0] - 180, 45))
     window.blit(pygame.transform.scale(screen, res), (0, 0))
-
 
     if Menu.flag:
         Menu.render()
