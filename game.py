@@ -42,7 +42,7 @@ for t in ['GK', 'KPM', 'NK', 'LK', 'ARKTICA', 'CIFRA']:
 for i in range(1, 15):
     for j in range(1, 5):
         textures['dm' + str(i) + '_' + str(j)] = pygame.image.load('images\\dorm'+str(i)+'_0'+str(j+int(j > 2))+'.jpg')
-for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2', 'KSP']:
+for i in ['sport1', 'sport2', 'sport0', 'shop', 'food1', 'food2', 'KSP', 'food3']:
     for j in range(1, 5):
         textures[i+str(j)] = pygame.image.load('images\\' + i + '_0' + str(j+int(j > 2))+'.jpg')
 
@@ -362,7 +362,7 @@ while not finished:
     if random_event_timer == 1200:
         rnd_num = random.randint(1, 32)
         # Обработка случайного события
-        random_event(rnd_num)
+        #random_event(rnd_num)
         random_event_timer = 0
     screen.fill(WHITE)
     mouse_x, mouse_y = pygame.mouse.get_pos()
