@@ -27,6 +27,7 @@ study_bilding5 = [119, 120, 121, 144, 145, 146, 169, 170, 171]
 study_bilding6 = [155, 156, 157, 180, 181, 182, 205, 206, 207]
 shop1 = [220, 221, 245, 246]
 shop2 = [217, 218, 242, 243]
+#0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 buldings = [food1, food2, house1, house2, house3, house4, house5, house6, house7, house8, house9, house10,house11, house12, house13, house14, house15, house16, house17, house18,
             study_bilding1, study_bilding2, study_bilding3, study_bilding4, study_bilding5, study_bilding6, shop1, shop2]
 building_textures_std = [['GK1','GK2','GK3','GK4','GK5','GK6','GK7','GK8','GK9'], ['LK1', 'LK2','LK3','LK4','LK5','LK6','LK7','LK8','LK9'],

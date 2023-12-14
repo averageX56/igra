@@ -401,8 +401,8 @@
 400  map
 401  map
 402  map
-403  hs1
-404  hs1
+dm1_1  hs1
+dm1_2  hs1
 405  map
 406  hs2
 407  hs2
@@ -426,8 +426,8 @@
 425  map
 426  map
 427  map
-428  hs1
-429  hs1
+dm1_3  hs1
+dm1_4  hs1
 430  map
 431  hs2
 432  hs2
