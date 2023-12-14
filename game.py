@@ -5,6 +5,7 @@ import random
 import time
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 
 
 FPS = 60
@@ -104,7 +105,8 @@ class Menu:
         self.flag = False
 
     def build(self):
-
+        enough_money = False
+        self.house=''
         global money, just_menu_chunck
         if self.type == 'std' and money > cost[0][self.chosen_point]:
             global std_massive
@@ -113,6 +115,8 @@ class Menu:
             std_mas[self.chosen_point - 1 - 2 * int(self.chosen_point > 3)] = 1
             Learn.built += 1
             money -= cost[0][self.chosen_point]
+            enough_money = True
+            self.house = std_massive[self.chosen_point]
         elif self.type == 'hs_right' and money > cost[1][self.chosen_point]:
             global hs_right_massive
             new_textures = building_textures_hs_right[self.chosen_point - 1]
@@ -120,6 +124,8 @@ class Menu:
             hs_right_mas[self.chosen_point - 1] = 1
             Dorm2.built += 1
             money -= cost[1][self.chosen_point]
+            enough_money = True
+            self.house = hs_right_massive[self.chosen_point]
         elif self.type == 'hs_left' and money > cost[2][self.chosen_point]:
             global hs_left_massive
             new_textures = building_textures_hs_left[self.chosen_point - 1]
@@ -127,6 +133,8 @@ class Menu:
             hs_left_mas[self.chosen_point - 1] = 1
             Dorm1.built += 1
             money -= cost[2][self.chosen_point]
+            enough_money = True
+            self.house = hs_left_massive[self.chosen_point]
         elif self.type == 'food' and money > cost[3][self.chosen_point]:
             global food_massive
             new_textures = building_textures_food[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)]
@@ -134,14 +142,20 @@ class Menu:
             food_mas[self.chosen_point - 1 - 3 * int(self.chosen_point > 3)] = 1
             Foodc.built += 1
             money -= cost[3][self.chosen_point]
-        for x in buldings:
-            if just_menu_chunck in x:
-                just_bulding = x
-                break
-        k = 0
-        for i in just_bulding:
-            chuncks_texture_codes[i] = new_textures[k]
-            k += 1
+            enough_money = True
+            self.house = food_massive[self.chosen_point]
+        if enough_money:
+            for x in buldings:
+                if just_menu_chunck in x:
+                    just_bulding = x
+                    break
+            k = 0
+            for i in just_bulding:
+                chuncks_texture_codes[i] = new_textures[k]
+                k += 1
+        else:
+            messagebox.showinfo('CAMPSIM','Недостаточно средств для постройки')
+
 
     def open_menu(self):
         self.flag = True
@@ -290,6 +304,11 @@ class Learn_build(Building):
 
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
+Menu = Menu()
+Dorm1 = Dormitory1()
+Dorm2 = Dormitory2()
+Learn = Learn_build()
+Foodc = Foodbuild()
 # Чтение файла с кодами текстур чанков из памяти
 chuncks_file = open('chuncks.txt', 'r')
 chuncks_texture_codes = []
@@ -307,6 +326,8 @@ std_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 hs_right_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 hs_left_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 food_mas = list(map(bool, list(map(int, info_file.readline().split()))))
+Dorm1.built, Dorm2.built, Learn.built, Foodc.built = list(map(int, info_file.readline().split()))
+money, happy = list(map(float, info_file.readline().split()))
 rnd_events_list = info_file.readline().split()
 info_file.close()
 std_massive = dict()
@@ -331,6 +352,7 @@ for i in [1, 2, 6, 7]:
     c += 1
 
 
+
 window = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 fullscreen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 screen = pygame.transform.scale(window, res)
@@ -338,13 +360,6 @@ finished = False
 clock = pygame.time.Clock()
 chunks = []
 chosen_x, chosen_y = 0, 0
-money = 2000
-happy = 1000
-Menu = Menu()
-Dorm1 = Dormitory1()
-Dorm2 = Dormitory2()
-Learn = Learn_build()
-Foodc = Foodbuild()
 
 # Создаём все чанки(пока нет работы с памятью)
 for y in range(world_size_chunk_y):
@@ -358,6 +373,7 @@ for i in range(len(chunks)):
 
 while not finished:
     clock.tick(FPS)
+    print(Dorm1.built, Dorm2.built, Learn.built)
     random_event_timer += 1
     if random_event_timer == 1200:
         rnd_num = random.randint(1, 32)
@@ -432,6 +448,12 @@ while not finished:
                     info_file.write('\n')
                     for i in range(len(food_mas)):
                         info_file.write(str(int(food_mas[i])) + ' ')
+                    info_file.write('\n')
+                    for i in [Dorm1, Dorm2, Learn, Foodc]:
+                        info_file.write(str(i.built) + ' ')
+                    info_file.write('\n')
+                    for i in [money, happy]:
+                        info_file.write(str(i) + ' ')
                     info_file.close()
 
                     # Закрываем программу
