@@ -38,7 +38,7 @@ textures['hs_left'] = pygame.image.load('images\\shop_down_left.png')
 textures['hs_right'] = pygame.image.load('images\\shop_down_right.png')
 textures['projects'] = pygame.image.load('images\\projects.jpg')
 textures['not_ready'] = pygame.image.load('images\\projects_unavailable.jpg')
-text_00 = font.render('To get access to projects \n you have to build all the buildings', 1, (0, 0, 255))
+text_00 = font.render(f'Firstly, build all campus', 1, (255, 255, 255))
 text_0 = font.render('Project menu', 1, (0, 0, 255))
 for t in ['GK', 'KPM', 'NK', 'LK', 'ARKTICA', 'CIFRA']:
     for r in range(1, 10):
@@ -195,7 +195,6 @@ class Menu:
 
     def __point_detect(self):
         global chosen_x, chosen_y
-        print(self.chosen_point)
         if chosen_x in range(470, 738):
             if chosen_y in range(155, 205):
                 self.chosen_point = 1
@@ -257,13 +256,14 @@ class Project_menu:
         self.flag = False
         self.type = 0
         self.chosen_point = 0
+        self.projects = [0, 0, 0, 0]
 
     def close_menu(self):
         self.flag = False
 
     def open_menu(self):
         self.flag = True
-        if Learn.count == 6:
+        if Learn.built == 6:
             self.type = 'ready'
         else:
             self.type = 'not ready'
@@ -277,8 +277,49 @@ class Project_menu:
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
             if self.type == 'not ready':
                 screen.blit(textures['not_ready'], (self.x, self.y))
-                screen.blit(text_00, (400, 400))
+                screen.blit(text_00, (525, 400))
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
+    def __point_detect(self):
+        global chosen_x, chosen_y
+        if chosen_x in range(470, 738):
+            if chosen_y in range(155, 205):
+                self.chosen_point = 1
+            elif chosen_y in range(255, 305):
+                self.chosen_point = 2
+            elif chosen_y in range(360, 410):
+                self.chosen_point = 3
+            elif chosen_y in range(460, 510):
+                self.chosen_point = 4
+            elif chosen_y in range(560, 610):
+                self.chosen_point = 5
+        if chosen_x in range(783, 1050):
+            if chosen_y in range(155, 205):
+                self.chosen_point = 6
+            elif chosen_y in range(255, 305):
+                self.chosen_point = 7
+            elif chosen_y in range(360, 410):
+                self.chosen_point = 8
+            elif chosen_y in range(460, 510):
+                self.chosen_point = 9
+            elif chosen_y in range(560, 610):
+                self.chosen_point = 10
+
+    def projecting(self):
+        global money
+        print(self.chosen_point)
+        self.__point_detect()
+        if self.chosen_point == 1 and money > cost[4][self.chosen_point - 1]:
+            self.projects[0] = 1
+            money -= cost[4][self.chosen_point - 1]
+        elif self.chosen_point == 2 and money > cost[4][self.chosen_point - 1]:
+            self.projects[1] = 1
+            money -= cost[4][self.chosen_point - 1]
+        elif self.chosen_point == 6 and money > cost[4][self.chosen_point - 1]:
+            self.projects[2] = 1
+            money -= cost[4][self.chosen_point - 1]
+        elif self.chosen_point == 7 and money > cost[4][self.chosen_point - 1]:
+            self.projects[3] = 1
+            money -= cost[4][self.chosen_point - 1]
 
 class Building:
     def __init__(self):
@@ -344,6 +385,7 @@ class Learn_build(Building):
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
 Menu = Menu()
+pr = Project_menu()
 Dorm1 = Dormitory1()
 Dorm2 = Dormitory2()
 Learn = Learn_build()
@@ -399,11 +441,6 @@ finished = False
 clock = pygame.time.Clock()
 chunks = []
 chosen_x, chosen_y = 0, 0
-pr = Project_menu()
-Dorm1 = Dormitory1()
-Dorm2 = Dormitory2()
-Learn = Learn_build()
-Foodc = Foodbuild()
 
 # Создаём все чанки(пока нет работы с памятью)
 for y in range(world_size_chunk_y):
@@ -417,7 +454,6 @@ for i in range(len(chunks)):
 
 while not finished:
     clock.tick(FPS)
-    print(Dorm1.built, Dorm2.built, Learn.built)
     random_event_timer += 1
     mouse_x, mouse_y = pygame.mouse.get_pos()
     Dorm1.money_exsc()
@@ -452,6 +488,7 @@ while not finished:
     text_2 = font.render(f'{round(money)}', 1, (240, 175, 14))
     screen.blit(text_2, (res[0] - 160, 45))
     pr.render()
+    pr.projecting()
     Menu.render()
     window.blit(pygame.transform.scale(screen, res), (0, 0))
 
@@ -463,7 +500,7 @@ while not finished:
             finished = True
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                if Menu.flag is False:
+                if Menu.flag is False and pr.flag is False:
                     # Делаем сохранение
 
                     chuncks_file.close()
@@ -498,6 +535,7 @@ while not finished:
                     finished = True
                 else:
                     Menu.close_menu()
+                    pr.flag = False
 # Обработка нажатия мыши
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # ЛКМ
@@ -512,13 +550,9 @@ while not finished:
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
                     print(chuncks_types[mouse_on_chunk_number])
-                elif mouse_x in range(res[0] - 340, res[0] - 260) and mouse_y in range(res[1] - 200, res[1] - 160) and not pr.flag:
+                elif mouse_x in range(res[0] - 340, res[0]) and mouse_y in range(res[1] - 200, res[1] - 130) and not pr.flag:
                     pr.open_menu()
-
-    if money < -1000 or happy < 0:
-        loser_text = font.render('Ваш кампус погряз в долгах, а студенты несчастливы. Вы проиграли', 1, (255, 0, 0))
-        screen.blit(loser_text, (res[0]/2 - 330, res[1]/2 - 450))
-        finished = True
+                    pr.render()
     pygame.display.update()
 
 pygame.quit()
