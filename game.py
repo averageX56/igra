@@ -1,9 +1,6 @@
 import pygame
 from рабочий import *
-import time
-from tkinter import *
 from tkinter import messagebox
-from tkinter import ttk
 
 
 FPS = 60
@@ -26,6 +23,7 @@ world_size_chunk_y = 25//chunk_size
 
 # Создаем пустой словарь, куда далее загружаем все нужные нам текстуры
 textures = dict()
+new_textures = None
 for i in range(625):
     textures[str(i)] = pygame.image.load(f'images/{i}.png')
 textures['cur_happy'] = pygame.image.load('images\\cur_happy.png')
@@ -67,9 +65,9 @@ def chunks_on_screen():
     y2 = min(max(y2, 0), world_size_chunk_y - 1)
 
     result = []
-    for y in range(y1, y2 + 1):
-        for x in range(x1, x2 + 1):
-            result.append(x+y*world_size_chunk_x)
+    for yr in range(y1, y2 + 1):
+        for xr in range(x1, x2 + 1):
+            result.append(xr + yr * world_size_chunk_x)
     return result
 
 
@@ -77,14 +75,14 @@ class Chunk:
     """
     класс чанка - квадрат на экране размером 150 * 150 пикселей
     """
-    def __init__(self, x, y, type = 'map'):
+    def __init__(self, pos_x, pos_y, type_chunck='map'):
         """
-        :param x: координата x левого верхнего края чанка
-        :param y: координата y левого верхнего края чанка
-        :param type: тип чанка. используется для обработки нажатий на чанк
+        :param pos_x: координата x левого верхнего края чанка
+        :param pos_y: координата y левого верхнего края чанка
+        :param type_chunck: тип чанка. используется для обработки нажатий на чанк
         """
-        self.x, self.y = x, y
-        self.type = type
+        self.x, self.y = pos_x, pos_y
+        self.type = type_chunck
 
     def render(self, texture_code):
         """
@@ -101,17 +99,19 @@ class Menu:
         self.flag = False
         self.type = 0
         self.chosen_point = 0
+        self.house = ''
 
     def close_menu(self):
         self.flag = False
 
     def build(self):
         enough_money = False
-        self.house=''
-        global money, just_menu_chunck
-        for x in buldings:
-            if just_menu_chunck in x:
-                just_bulding = x
+        closed_flag = True
+        just_bulding = None
+        global money, just_menu_chunck, new_textures
+        for b in buldings:
+            if just_menu_chunck in b:
+                just_bulding = b
                 number_building = buldings.index(just_bulding)
                 if closed_chuncks[number_building] == 1:
                     closed_flag = True
@@ -165,14 +165,13 @@ class Menu:
                 self.house = food_massive[self.chosen_point]
             if enough_money:
                 k = 0
-                for i in just_bulding:
-                    chuncks_texture_codes[i] = new_textures[k]
+                for q in just_bulding:
+                    chuncks_texture_codes[q] = new_textures[k]
                     k += 1
             else:
                 messagebox.showinfo('CAMPSIM', 'Недостаточно средств для постройки')
         else:
             messagebox.showinfo('CAMPSIM', 'Место уже занято')
-
 
     def open_menu(self):
         self.flag = True
@@ -256,7 +255,8 @@ class Menu:
                     print('not built')
                     self.build()
 
-class Project_menu:
+
+class ProjectMenu:
     def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
         self.x = m_x
         self.y = m_y
@@ -288,6 +288,7 @@ class Project_menu:
             if a is True:
                 text_win = font.render('You win', 1, (255, 255, 255))
                 screen.blit(text_win, (res[0]/2 - 100, res[1]/2))
+
     def __point_detect(self):
         global chosen_x, chosen_y
         if chosen_x in range(470, 738):
@@ -329,6 +330,7 @@ class Project_menu:
             projects[3] = 1
             money -= cost[4][self.chosen_point - 1]
 
+
 class Building:
     def __init__(self):
         self.income = 0
@@ -345,6 +347,7 @@ class Building:
 
 class Dormitory1(Building):
     def __init__(self):
+        Building.__init__(self)
         self.built = 0
         self.income = 0.5
         self.outcome = 0.01
@@ -353,6 +356,7 @@ class Dormitory1(Building):
 
 class Dormitory2(Building):
     def __init__(self):
+        Building.__init__(self)
         self.built = 0
         self.income = 0.6
         self.outcome = 0.01
@@ -361,14 +365,16 @@ class Dormitory2(Building):
 
 class Foodbuild(Building):
     def __init__(self):
+        Building.__init__(self)
         self.built = 0
         self.income = 0.5
         self.outcome = 0.1
         self.happy = 0
 
 
-class Learn_build(Building):
+class LearnBuild(Building):
     def __init__(self):
+        Building.__init__(self)
         self.built = 0
         self.income = 0
         self.outcome = 0.6
@@ -378,10 +384,10 @@ class Learn_build(Building):
 """Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
 
 Menu = Menu()
-pr = Project_menu()
+pr = ProjectMenu()
 Dorm1 = Dormitory1()
 Dorm2 = Dormitory2()
-Learn = Learn_build()
+Learn = LearnBuild()
 Foodc = Foodbuild()
 # Чтение файла с кодами текстур чанков из памяти
 chuncks_file = open('chuncks.txt', 'r')
@@ -485,7 +491,6 @@ while not finished:
     Menu.render()
     window.blit(pygame.transform.scale(screen, res), (0, 0))
 
-
     # Обработка событий
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -546,10 +551,9 @@ while not finished:
                     # Вызов меню при нажатии по чанку
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
-                elif mouse_x in range(res[0] - 340, res[0]) and mouse_y in range(res[1] - 200, res[1] - 130) and not pr.flag:
+                elif mouse_x in range(1200, 1540) and mouse_y in range(res[1] - 200, res[1] - 130) and not pr.flag:
                     pr.open_menu()
                     pr.render()
     a = projects == [1, 1, 1, 1]
     pygame.display.update()
-
 pygame.quit()
