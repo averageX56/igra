@@ -7,7 +7,7 @@ FPS = 60
 
 chunk_size = 1
 tile_size = 150
-cam_speed = 150
+cam_speed = 15
 
 WHITE = 0xFFFFFF
 
@@ -94,6 +94,10 @@ class Chunk:
 
 
 class Menu:
+    '''
+
+    класс меню - магазина, взаимодействуя с которым можно строить здания
+    '''
     def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
         self.x, self.y = m_x, m_y
         self.flag = False
@@ -105,6 +109,10 @@ class Menu:
         self.flag = False
 
     def build(self):
+        '''
+        функция класса меню, которая вызывается при нажатии на меню
+        в зависимости от состояния tale, balance либо строит здание либо уведомляет об ошибкке
+        '''
         enough_money = False
         closed_flag = True
         just_bulding = None
@@ -174,6 +182,9 @@ class Menu:
             messagebox.showinfo('CAMPSIM', 'Место уже занято')
 
     def open_menu(self):
+        '''
+        функция вызова меню. в зависимости от типа tale вызывает разное меню
+        '''
         self.flag = True
         if 'std' in chuncks_types[mouse_on_chunk_number]:
             self.type = 'std'
@@ -185,6 +196,9 @@ class Menu:
             self.type = 'hs_right'
 
     def render(self):
+        '''
+        функция отрисовки меню на экране
+        '''
         if self.flag is True:
             if self.type == 'std':
                 screen.blit(textures['std'], (self.x, self.y))
@@ -200,6 +214,9 @@ class Menu:
                 window.blit(pygame.transform.scale(screen, res), (0, 0))
 
     def __point_detect(self):
+        '''
+        функция, определяюща положение мыши при нажатии на меню
+        '''
         global chosen_x, chosen_y
         if chosen_x in range(470, 738):
             if chosen_y in range(155, 205):
@@ -225,6 +242,9 @@ class Menu:
                 self.chosen_point = 10
 
     def processing_click(self):
+        '''
+        функция обработки нажатия на меню
+        '''
         self.__point_detect()
         if self.type == 'std':
             if self.chosen_point in std_massive:
@@ -257,6 +277,9 @@ class Menu:
 
 
 class ProjectMenu:
+    '''
+    класс меню с итоговыми проектами
+    '''
     def __init__(self, m_x=res[0]/2 - 330, m_y=res[1]/2 - 450):
         self.x = m_x
         self.y = m_y
@@ -275,6 +298,9 @@ class ProjectMenu:
             self.type = 'not ready'
 
     def render(self):
+        '''
+        функция прорисовки итогового меню
+        '''
         screen.blit(text_0, (res[0] - 300, res[1] - 180))
         window.blit(pygame.transform.scale(screen, res), (0, 0))
         if self.flag is True:
@@ -332,6 +358,9 @@ class ProjectMenu:
 
 
 class Building:
+    '''
+    класс зданий
+    '''
     def __init__(self):
         self.income = 0
         self.outcome = 0
@@ -381,7 +410,9 @@ class LearnBuild(Building):
         self.happy = 0.15
 
 
-"""Запуск игры, вытягивание всей информации из файлов, инициализация объектов"""
+"""
+Запуск игры, вытягивание всей информации из файлов, инициализация объектов
+"""
 
 Menu = Menu()
 pr = ProjectMenu()
@@ -389,7 +420,9 @@ Dorm1 = Dormitory1()
 Dorm2 = Dormitory2()
 Learn = LearnBuild()
 Foodc = Foodbuild()
+
 # Чтение файла с кодами текстур чанков из памяти
+
 chuncks_file = open('chuncks.txt', 'r')
 chuncks_texture_codes = []
 chuncks_types = []
@@ -402,6 +435,7 @@ for i in range(625):
 chuncks_file.close()
 
 # Чтение файла с общей информацией
+
 info_file = open('game_info.txt', 'r')
 std_mas = list(map(bool, list(map(int, info_file.readline().split()))))
 hs_right_mas = list(map(bool, list(map(int, info_file.readline().split()))))
@@ -443,6 +477,7 @@ chunks = []
 chosen_x, chosen_y = 0, 0
 
 # Создаём все чанки(пока нет работы с памятью)
+
 for y in range(world_size_chunk_y):
     for x in range(world_size_chunk_x):
         chunks.append(Chunk(x*chunk_size*tile_size, y*chunk_size*tile_size))
@@ -450,7 +485,9 @@ for y in range(world_size_chunk_y):
 for i in range(len(chunks)):
     chunks[i].type = chuncks_types[i]
 
-"""Конец запуска игры. Собственно игровой процесс"""
+"""
+Конец запуска игры. Собственно игровой процесс
+"""
 
 while not finished:
     clock.tick(FPS)
@@ -462,7 +499,9 @@ while not finished:
     mouse_on_chunk_x, mouse_on_chunk_y = ((mouse_x + cam_x)//tile_size, (mouse_y + cam_y)//tile_size)
     mouse_on_chunk_number = mouse_on_chunk_y * 25 + mouse_on_chunk_x
 
-    # Обработка зажатых клавиш
+    '''
+    Обработка зажатых клавиш
+    '''
     key = pygame.key.get_pressed()
     if key[pygame.K_a]:
         if cam_x >= 15:
@@ -477,7 +516,9 @@ while not finished:
         if cam_y <= world_size_chunk_y * tile_size - res[1] - cam_speed:
             cam_y += cam_speed
 
-    # Рендерим чанки, которые отображаются на экране
+    '''
+    Рендерим чанки, которые отображаются на экране
+    '''
     for i in chunks_on_screen():
         chunks[i].render(chuncks_texture_codes[i])
     screen.blit(textures['cur_happy'], (20, 20))
@@ -491,7 +532,9 @@ while not finished:
     Menu.render()
     window.blit(pygame.transform.scale(screen, res), (0, 0))
 
-    # Обработка событий
+    '''
+    Обработка событий
+    '''
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             chuncks_file.close()
@@ -499,7 +542,9 @@ while not finished:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 if Menu.flag is False and pr.flag is False:
-                    # Делаем сохранение
+                    '''
+                    Делаем сохранение
+                    '''
 
                     chuncks_file.close()
                     chuncks_file = open('chuncks.txt', 'w')
@@ -532,23 +577,35 @@ while not finished:
                         info_file.write(str(closed_chuncks[i]) + ' ')
                     info_file.close()
 
-                    # Закрываем программу
+                    '''
+                    Закрываем программу
+                    '''
                     finished = True
                 else:
                     Menu.close_menu()
                     pr.flag = False
-# Обработка нажатия мыши
+
+            '''
+            Обработка нажатия мыши
+            '''
+
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # ЛКМ
             if event.button == 1:
-                # Проверка типа нажатого тейла и соответсвующая обработка события
+                '''
+                Проверка типа нажатого тейла и соответсвующая обработка события
+                '''
                 if Menu.flag or pr.flag:
-                    # Нажатие при открытом меню
+                    '''
+                    Нажатие при открытом меню
+                    '''
                     chosen_x, chosen_y = mouse_x, mouse_y
                     Menu.processing_click()
                     pr.projecting()
                 elif (chuncks_types[mouse_on_chunk_number] in open_chuncks) and not Menu.flag:
-                    # Вызов меню при нажатии по чанку
+                    '''
+                    Вызов меню при нажатии по чанку
+                    '''
                     Menu.open_menu()
                     just_menu_chunck = mouse_on_chunk_number
                 elif mouse_x in range(1200, 1540) and mouse_y in range(res[1] - 200, res[1] - 130) and not pr.flag:
